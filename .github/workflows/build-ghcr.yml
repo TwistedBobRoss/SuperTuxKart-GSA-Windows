@@ -1,0 +1,61 @@
+name: Build and publish Windows container
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - Dockerfile
+      - Start.ps1
+      - server_config.xml
+      - .github/workflows/build-ghcr.yml
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE_NAME: ghcr.io/twistedbobross/supertuxkart-gsa-windows
+  IMAGE_TAG: 1.5-ltsc2022
+
+jobs:
+  build:
+    runs-on: windows-2022
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Show Docker runtime
+        shell: powershell
+        run: |
+          docker version
+          docker info
+
+      - name: Log in to GitHub Container Registry
+        shell: powershell
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $env:GHCR_TOKEN | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Build Windows image
+        shell: powershell
+        run: |
+          $versionTag = "${env:IMAGE_NAME}:${env:IMAGE_TAG}"
+          $latestTag = "${env:IMAGE_NAME}:latest"
+          docker build --pull `
+            --build-arg STK_VERSION=1.5 `
+            --build-arg STK_ZIP_URL=https://github.com/supertuxkart/stk-code/releases/download/1.5/SuperTuxKart-1.5-win.zip `
+            -t $versionTag `
+            -t $latestTag `
+            .
+
+      - name: Push image
+        shell: powershell
+        run: |
+          $versionTag = "${env:IMAGE_NAME}:${env:IMAGE_TAG}"
+          $latestTag = "${env:IMAGE_NAME}:latest"
+          docker push $versionTag
+          docker push $latestTag
