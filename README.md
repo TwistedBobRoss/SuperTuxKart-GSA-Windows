@@ -9,8 +9,26 @@ This repo contains:
 - `server_config.xml` - default editable STK server config.
 - `docker-run.example.ps1` - local test command.
 - `blueprints/supertuxkart-gsa-windows.json` - GSA blueprint import draft.
+- `.github/workflows/build-ghcr.yml` - GitHub Actions workflow that builds and publishes the Windows container image.
 
-## Build
+## Build With GitHub Actions
+
+The easiest path is to use the included GitHub Actions workflow:
+
+1. Open the repo's **Actions** tab.
+2. Select **Build and publish Windows container**.
+3. Click **Run workflow**.
+
+The workflow publishes these tags to GitHub Container Registry:
+
+```text
+ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022
+ghcr.io/twistedbobross/supertuxkart-gsa-windows:latest
+```
+
+After the first successful build, make sure the GHCR package is public if GSA will pull it without registry credentials.
+
+## Build Locally
 
 Run this on a Windows Docker host using Windows containers:
 
