@@ -11,9 +11,10 @@ WORKDIR C:/stk
 RUN New-Item -ItemType Directory -Force -Path C:/temp, C:/stk, C:/serverfiles | Out-Null; \
     Invoke-WebRequest -Uri $env:STK_ZIP_URL -OutFile C:/temp/stk.zip; \
     Expand-Archive -Path C:/temp/stk.zip -DestinationPath C:/temp/stk -Force; \
-    $exe = Get-ChildItem -Path C:/temp/stk -Recurse -Filter supertuxkart.exe | Select-Object -First 1; \
-    if (-not $exe) { throw 'supertuxkart.exe not found in release zip'; }; \
-    Copy-Item -Path (Join-Path $exe.DirectoryName '*') -Destination C:/stk -Recurse -Force; \
+    $root = Get-ChildItem -Path C:/temp/stk -Directory | Where-Object { Test-Path (Join-Path $_.FullName 'stk-code/build-x86_64/bin/supertuxkart.exe') } | Select-Object -First 1; \
+    if (-not $root) { throw 'SuperTuxKart package root with x86_64 binary not found in release zip'; }; \
+    Copy-Item -Path (Join-Path $root.FullName '*') -Destination C:/stk -Recurse -Force; \
+    if (-not (Test-Path 'C:/stk/stk-code/build-x86_64/bin/supertuxkart.exe')) { throw 'x86_64 supertuxkart.exe not found after copy'; }; \
     Remove-Item -Recurse -Force C:/temp
 
 COPY Start.ps1 C:/stk/Start.ps1
