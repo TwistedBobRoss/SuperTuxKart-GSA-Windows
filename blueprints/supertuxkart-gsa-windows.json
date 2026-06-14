@@ -1,0 +1,123 @@
+{
+  "_version": 3,
+  "type": "custom",
+  "docker": {
+    "ports": {
+      "raw": {
+        "port": "2757",
+        "multiplier": "10"
+      },
+      "game": {
+        "port": "2759",
+        "multiplier": "10"
+      }
+    },
+    "image": {
+      "name": "ghcr.io/twistedbobross/supertuxkart-gsa-windows",
+      "tag": "1.5-ltsc2022"
+    },
+    "envs": {
+      "STK_USERNAME": "{config_parameter id=\"stk_username\"}",
+      "STK_PASSWORD": "{config_parameter id=\"stk_password\"}"
+    },
+    "mounts": {
+      "{container.home_root}/serverfiles": "C:/serverfiles"
+    }
+  },
+  "dir": {
+    "Serverfiles": {
+      "path": "\\serverfiles",
+      "create": true,
+      "type": "normal"
+    }
+  },
+  "game": {
+    "server": {
+      "wipe": [],
+      "backup": {},
+      "monitoring": {
+        "type": "container",
+        "recovery_mode": true
+      }
+    },
+    "type": "custom",
+    "config": {
+      "files": {
+        "server_config.xml": {
+          "path": "\\serverfiles\\server_config.xml",
+          "info": "SuperTuxKart Windows server configuration. Mounted into the container at C:/serverfiles/server_config.xml.",
+          "disable_edit": "0",
+          "content": "<?xml version=\"1.0\"?>\n<server-config version=\"6\" >\n    <server-name value=\"{gameserver.list_name}\" />\n    <server-port value=\"{gameserver.game_port}\" />\n    <server-mode value='{config_parameter id=\"server_mode\"}' />\n    <server-difficulty value='{config_parameter id=\"server_difficulty\"}' />\n    <gp-track-count value=\"3\" />\n    <soccer-goal-target value=\"false\" />\n    <wan-server value='{config_parameter id=\"wan_server\"}' />\n    <enable-console value=\"false\" />\n    <server-max-players value=\"{gameserver.slot_limit}\" />\n    <private-server-password value='{config_parameter id=\"private_server_password\"}' />\n    <motd value='{config_parameter id=\"motd\"}' />\n    <chat value=\"true\" />\n    <chat-consecutive-interval value=\"8\" />\n    <track-voting value='{config_parameter id=\"track_voting\"}' />\n    <voting-timeout value=\"30\" />\n    <validation-timeout value=\"20\" />\n    <validating-player value=\"true\" />\n    <firewalled-server value=\"true\" />\n    <ipv6-connection value=\"true\" />\n    <owner-less value='{config_parameter id=\"owner_less\"}' />\n    <start-game-counter value=\"60\" />\n    <official-karts-threshold value=\"1\" />\n    <official-tracks-threshold value=\"0.7\" />\n    <min-start-game-players value=\"2\" />\n    <auto-end value=\"false\" />\n    <team-choosing value=\"true\" />\n    <strict-players value=\"false\" />\n    <ranked value=\"false\" />\n    <server-configurable value='{config_parameter id=\"server_configurable\"}' />\n    <live-spectate value='{config_parameter id=\"live_spectate\"}' />\n    <flag-return-timeout value=\"20\" />\n    <flag-deactivated-time value=\"3\" />\n    <hit-limit value=\"20\" />\n    <time-limit-ffa value=\"360\" />\n    <capture-limit value=\"5\" />\n    <time-limit-ctf value=\"600\" />\n    <auto-game-time-ratio value=\"-1\" />\n    <max-ping value=\"300\" />\n    <jitter-tolerance value=\"100\" />\n    <kick-high-ping-players value=\"false\" />\n    <high-ping-workaround value=\"true\" />\n    <kick-idle-player-seconds value=\"60\" />\n    <state-frequency value=\"10\" />\n    <sql-management value=\"false\" />\n    <database-file value=\"stkservers.db\" />\n    <database-timeout value=\"1000\" />\n    <ip-ban-table value=\"ip_ban\" />\n    <ipv6-ban-table value=\"ipv6_ban\" />\n    <online-id-ban-table value=\"online_id_ban\" />\n    <player-reports-table value=\"player_reports\" />\n    <player-reports-expired-days value=\"3\" />\n    <ip-geolocation-table value=\"ip_mapping\" />\n    <ipv6-geolocation-table value=\"ipv6_mapping\" />\n    <ai-handling value=\"false\" />\n</server-config>\n"
+        }
+      },
+      "parameters": {
+        "stk_username": {
+          "name": "STK Account Username",
+          "info": "Optional. Required only when wan_server is true and you want public STK online listing.",
+          "type": "text",
+          "content": ""
+        },
+        "stk_password": {
+          "name": "STK Account Password",
+          "info": "Optional. Used by Start.ps1 for initial STK login before launching the server.",
+          "type": "text",
+          "content": ""
+        },
+        "wan_server": {
+          "name": "WAN/Public Server",
+          "info": "true lists as a WAN server and requires a valid STK account. false is best for first tests.",
+          "type": "text",
+          "content": "false"
+        },
+        "server_mode": {
+          "name": "Server Mode",
+          "info": "0 normal race GP, 1 time trial GP, 3 normal race, 4 time trial, 6 soccer, 7 free-for-all, 8 capture the flag.",
+          "type": "text",
+          "content": "3"
+        },
+        "server_difficulty": {
+          "name": "Difficulty",
+          "info": "0 beginner, 1 intermediate, 2 expert, 3 supertux.",
+          "type": "text",
+          "content": "0"
+        },
+        "private_server_password": {
+          "name": "Private Server Password",
+          "info": "Leave blank for public access.",
+          "type": "text",
+          "content": ""
+        },
+        "motd": {
+          "name": "Message Of The Day",
+          "info": "Short lobby message. XML-escape special characters if editing directly.",
+          "type": "text",
+          "content": "Welcome to {gameserver.list_name}!"
+        },
+        "track_voting": {
+          "name": "Track Voting",
+          "info": "true lets players vote tracks. false makes the server choose randomly.",
+          "type": "text",
+          "content": "true"
+        },
+        "owner_less": {
+          "name": "Ownerless Lobby",
+          "info": "true removes the lobby owner role and relies on automatic start behavior.",
+          "type": "text",
+          "content": "false"
+        },
+        "server_configurable": {
+          "name": "Lobby Configurable",
+          "info": "true lets the server owner change mode/difficulty in lobby where supported.",
+          "type": "text",
+          "content": "false"
+        },
+        "live_spectate": {
+          "name": "Live Spectate",
+          "info": "true allows live join/spectate in supported modes.",
+          "type": "text",
+          "content": "true"
+        }
+      }
+    }
+  }
+}
