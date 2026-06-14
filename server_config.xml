@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<server-config version="6" >
+    <server-name value="{gameserver.list_name}" />
+    <server-port value="{gameserver.game_port}" />
+    <server-mode value='{config_parameter id="server_mode"}' />
+    <server-difficulty value='{config_parameter id="server_difficulty"}' />
+    <gp-track-count value="3" />
+    <soccer-goal-target value="false" />
+    <wan-server value='{config_parameter id="wan_server"}' />
+    <enable-console value="false" />
+    <server-max-players value="{gameserver.slot_limit}" />
+    <private-server-password value='{config_parameter id="private_server_password"}' />
+    <motd value='{config_parameter id="motd"}' />
+    <chat value="true" />
+    <chat-consecutive-interval value="8" />
+    <track-voting value='{config_parameter id="track_voting"}' />
+    <voting-timeout value="30" />
+    <validation-timeout value="20" />
+    <validating-player value="true" />
+    <firewalled-server value="true" />
+    <ipv6-connection value="true" />
+    <owner-less value='{config_parameter id="owner_less"}' />
+    <start-game-counter value="60" />
+    <official-karts-threshold value="1" />
+    <official-tracks-threshold value="0.7" />
+    <min-start-game-players value="2" />
+    <auto-end value="false" />
+    <team-choosing value="true" />
+    <strict-players value="false" />
+    <ranked value="false" />
+    <server-configurable value='{config_parameter id="server_configurable"}' />
+    <live-spectate value='{config_parameter id="live_spectate"}' />
+    <flag-return-timeout value="20" />
+    <flag-deactivated-time value="3" />
+    <hit-limit value="20" />
+    <time-limit-ffa value="360" />
+    <capture-limit value="5" />
+    <time-limit-ctf value="600" />
+    <auto-game-time-ratio value="-1" />
+    <max-ping value="300" />
+    <jitter-tolerance value="100" />
+    <kick-high-ping-players value="false" />
+    <high-ping-workaround value="true" />
+    <kick-idle-player-seconds value="60" />
+    <state-frequency value="10" />
+    <sql-management value="false" />
+    <database-file value="stkservers.db" />
+    <database-timeout value="1000" />
+    <ip-ban-table value="ip_ban" />
+    <ipv6-ban-table value="ipv6_ban" />
+    <online-id-ban-table value="online_id_ban" />
+    <player-reports-table value="player_reports" />
+    <player-reports-expired-days value="3" />
+    <ip-geolocation-table value="ip_mapping" />
+    <ipv6-geolocation-table value="ipv6_mapping" />
+    <ai-handling value="false" />
+</server-config>
