@@ -1,4 +1,4 @@
-$Image = "ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r2"
+$Image = "ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r3"
 $ContainerName = "twisted-supertuxkart"
 $ServerFiles = "C:\stk-test\serverfiles"
 
@@ -15,4 +15,5 @@ docker run --name $ContainerName `
   -v "${ServerFiles}:C:\serverfiles" `
   -e STK_USERNAME="" `
   -e STK_PASSWORD="" `
+  -e STK_LOGIN_REQUIRED="false" `
   $Image
