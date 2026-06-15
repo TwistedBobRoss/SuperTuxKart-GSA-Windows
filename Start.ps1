@@ -1,8 +1,8 @@
 $ErrorActionPreference = "Stop"
 
-$exe = "C:\stk\stk-code\build-x86_64\bin\supertuxkart.exe"
+$exe = "C:\stk\stk-code\build_x86_64\bin\supertuxkart.exe"
 $config = "C:\serverfiles\server_config.xml"
-$workingDirectory = Split-Path -LiteralPath $exe -Parent
+$workingDirectory = [System.IO.Path]::GetDirectoryName($exe)
 
 if (-not (Test-Path -LiteralPath $exe)) {
     throw "Could not find $exe"
