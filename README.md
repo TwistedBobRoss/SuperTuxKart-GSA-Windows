@@ -22,7 +22,7 @@ The easiest path is to use the included GitHub Actions workflow:
 The workflow publishes these tags to GitHub Container Registry:
 
 ```text
-ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r2
+ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r3
 ghcr.io/twistedbobross/supertuxkart-gsa-windows:latest
 ```
 
@@ -33,7 +33,7 @@ After the first successful build, make sure the GHCR package is public if GSA wi
 Run this on a Windows Docker host using Windows containers:
 
 ```powershell
-docker build -t ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r2 .
+docker build -t ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r3 .
 ```
 
 ## Test
@@ -48,7 +48,7 @@ docker logs twisted-supertuxkart
 GSA pulls images from a registry. After testing, push the image to GitHub Container Registry:
 
 ```powershell
-docker push ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r2
+docker push ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r3
 ```
 
 Then import `blueprints/supertuxkart-gsa-windows.json` in GameServerApp.
@@ -57,7 +57,8 @@ Then import `blueprints/supertuxkart-gsa-windows.json` in GameServerApp.
 
 - Main server port: UDP `2759`.
 - Discovery port: UDP `2757`.
-- Public/WAN listing requires an STK online account. Fill `STK_USERNAME` and `STK_PASSWORD`, and set `wan_server=true` in the config template.
+- Public/WAN listing requires an STK online account. Fill `STK_USERNAME` and `STK_PASSWORD`, set `wan_server=true`, and set `STK_LOGIN_REQUIRED=true` if a bad login should stop the server.
+- For first direct-connect tests, leave `wan_server=false` and `STK_LOGIN_REQUIRED=false`.
 - The image explicitly uses the x86_64 SuperTuxKart Windows binary from the combined Windows release archive.
 - The initial version uses the official Windows release binary, not a dedicated server-only Windows build.
 - If the official binary refuses to run headless inside a Windows container, the next step is building SuperTuxKart from source with `SERVER_ONLY=ON`.
