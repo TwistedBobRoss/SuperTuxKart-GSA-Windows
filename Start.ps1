@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
-$exe = "C:\stk\stk-code\build-x86_64\bin\supertuxkart.exe"
-$config = "C:\serverfiles\server_config.xml"
+$exe = "C:/stk/stk-code/build-x86_64/bin/supertuxkart.exe"
+$config = "C:/serverfiles/server_config.xml"
 $workingDirectory = [System.IO.Path]::GetDirectoryName($exe)
 
 if (-not (Test-Path -LiteralPath $exe)) {
@@ -9,35 +9,29 @@ if (-not (Test-Path -LiteralPath $exe)) {
 }
 
 if (-not (Test-Path -LiteralPath $config)) {
-    throw "Could not find $config. Mount or create C:\serverfiles\server_config.xml before starting."
+    throw "Could not find $config. Mount or create C:/serverfiles/server_config.xml before starting."
 }
 
 function Invoke-Stk {
     param([string[]]$Arguments)
 
-    $argumentList = ($Arguments | ForEach-Object {
-        if ($_ -match '[\s"]') {
-            '"' + ($_ -replace '"', '\"') + '"'
-        }
-        else {
-            $_
-        }
-    }) -join " "
+    Write-Host ("Running SuperTuxKart with args: {0}" -f ($Arguments -join " "))
 
-    $process = Start-Process `
-        -FilePath $exe `
-        -ArgumentList $argumentList `
-        -WorkingDirectory $workingDirectory `
-        -NoNewWindow `
-        -Wait `
-        -PassThru
+    Push-Location $workingDirectory
+    try {
+        & $exe @Arguments
+        $exitCode = $LASTEXITCODE
+    }
+    finally {
+        Pop-Location
+    }
 
-    if ($null -eq $process.ExitCode) {
+    if ($null -eq $exitCode) {
         Write-Warning "SuperTuxKart exited without reporting an exit code; treating this as success."
         return 0
     }
 
-    return [int]$process.ExitCode
+    return [int]$exitCode
 }
 
 function Test-UsableEnvValue {
@@ -72,5 +66,5 @@ else {
     Write-Host "Skipping SuperTuxKart account initialization because usable STK credentials were not provided."
 }
 
-$exitCode = Invoke-Stk @("--server-config=$config")
+$exitCode = Invoke-Stk @("--no-graphics", "--server-config=$config")
 exit $exitCode
