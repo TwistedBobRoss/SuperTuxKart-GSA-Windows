@@ -8,6 +8,7 @@ This repo contains:
 - `Start.ps1` - initializes an optional STK online account, then starts the server from `server_config.xml`.
 - `server_config.xml` - default editable STK server config.
 - `docker-run.example.ps1` - local test command.
+- `docker-run.gsa-import.txt` - GSA Docker import command with config parameters wired into container environment variables.
 - `blueprints/supertuxkart-gsa-windows.json` - GSA blueprint import draft.
 - `.github/workflows/build-ghcr.yml` - GitHub Actions workflow that builds and publishes the Windows container image.
 
@@ -22,7 +23,7 @@ The easiest path is to use the included GitHub Actions workflow:
 The workflow publishes these tags to GitHub Container Registry:
 
 ```text
-ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r3
+ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022_x86_64-r3
 ghcr.io/twistedbobross/supertuxkart-gsa-windows:latest
 ```
 
@@ -42,6 +43,18 @@ docker build -t ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86
 .\docker-run.example.ps1
 docker logs twisted-supertuxkart
 ```
+
+## GSA Import
+
+For a fresh GameServerApp custom Docker blueprint, import `docker-run.gsa-import.txt` or paste its single-line `docker run` command. This wires the STK account parameters into the container environment variables:
+
+```text
+STK_USERNAME={config_parameter id="stk_username"}
+STK_PASSWORD={config_parameter id="stk_password"}
+STK_LOGIN_REQUIRED={config_parameter id="stk_login_required"}
+```
+
+If you created a server from an older command where `STK_USERNAME` and `STK_PASSWORD` were blank, update the blueprint Docker environment variables and reinstall/recreate the game server. Container environment variables are set when the container is created; changing config parameter values later will not repair an already-created container with blank env vars.
 
 ## Publish
 
