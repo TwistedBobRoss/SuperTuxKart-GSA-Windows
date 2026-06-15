@@ -22,7 +22,7 @@ The easiest path is to use the included GitHub Actions workflow:
 The workflow publishes these tags to GitHub Container Registry:
 
 ```text
-ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64
+ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r2
 ghcr.io/twistedbobross/supertuxkart-gsa-windows:latest
 ```
 
@@ -33,7 +33,7 @@ After the first successful build, make sure the GHCR package is public if GSA wi
 Run this on a Windows Docker host using Windows containers:
 
 ```powershell
-docker build -t ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64 .
+docker build -t ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r2 .
 ```
 
 ## Test
@@ -48,7 +48,7 @@ docker logs twisted-supertuxkart
 GSA pulls images from a registry. After testing, push the image to GitHub Container Registry:
 
 ```powershell
-docker push ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64
+docker push ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r2
 ```
 
 Then import `blueprints/supertuxkart-gsa-windows.json` in GameServerApp.
