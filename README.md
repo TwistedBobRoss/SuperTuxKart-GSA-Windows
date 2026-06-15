@@ -23,7 +23,7 @@ The easiest path is to use the included GitHub Actions workflow:
 The workflow publishes these tags to GitHub Container Registry:
 
 ```text
-ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022_x86_64-r3
+ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r3
 ghcr.io/twistedbobross/supertuxkart-gsa-windows:latest
 ```
 
