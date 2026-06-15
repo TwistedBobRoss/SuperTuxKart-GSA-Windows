@@ -8,8 +8,8 @@ This repo contains:
 - `Start.ps1` - initializes an optional STK online account, then starts the server from `server_config.xml`.
 - `server_config.xml` - default editable STK server config.
 - `docker-run.example.ps1` - local test command.
-- `docker-run.gsa-import.txt` - GSA Docker import command with config parameters wired into container environment variables.
-- `blueprints/supertuxkart-gsa-windows.json` - GSA blueprint import draft.
+- `docker-run.gsa-import.txt` - simple GSA Docker import seed command.
+- `blueprints/supertuxkart-gsa-windows.json` - GSA blueprint import draft with config parameters wired into Docker env vars.
 - `.github/workflows/build-ghcr.yml` - GitHub Actions workflow that builds and publishes the Windows container image.
 
 ## Build With GitHub Actions
@@ -46,13 +46,17 @@ docker logs twisted-supertuxkart
 
 ## GSA Import
 
-For a fresh GameServerApp custom Docker blueprint, import `docker-run.gsa-import.txt` or paste its single-line `docker run` command. This wires the STK account parameters into the container environment variables:
+Best option: import `blueprints/supertuxkart-gsa-windows.json`. That file already wires the STK account parameters into Docker environment variables.
+
+If you use GameServerApp's **Import Custom Docker container** flow, paste the simple command from `docker-run.gsa-import.txt`. It is intentionally not fully parameterized, because the Docker run import parser may ignore quoted `{config_parameter ...}` values. After import, edit **Docker > Environment variables** in the blueprint:
 
 ```text
-STK_USERNAME={config_parameter id="stk_username"}
-STK_PASSWORD={config_parameter id="stk_password"}
-STK_LOGIN_REQUIRED={config_parameter id="stk_login_required"}
+STK_USERNAME = {config_parameter id="stk_username"}
+STK_PASSWORD = {config_parameter id="stk_password"}
+STK_LOGIN_REQUIRED = {config_parameter id="stk_login_required"}
 ```
+
+For a private test blueprint, you can instead put the literal STK username/password directly in those Docker env rows. Do not publish credentials in a marketplace blueprint.
 
 If you created a server from an older command where `STK_USERNAME` and `STK_PASSWORD` were blank, update the blueprint Docker environment variables and reinstall/recreate the game server. Container environment variables are set when the container is created; changing config parameter values later will not repair an already-created container with blank env vars.
 
