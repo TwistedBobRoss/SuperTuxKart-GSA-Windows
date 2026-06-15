@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 
-$exe = "C:\stk\stk-code\build_x86_64\bin\supertuxkart.exe"
+$exe = "C:\stk\stk-code\build-x86_64\bin\supertuxkart.exe"
 $config = "C:\serverfiles\server_config.xml"
 $workingDirectory = [System.IO.Path]::GetDirectoryName($exe)
 
