@@ -1,1 +1,1 @@
-docker run -d --name supertuxkart-gsa-test -p 2757:2757/udp -p 2759:2759/udp -v {container.home_root}/serverfiles:C:/serverfiles -e STK_USERNAME=CHANGE_ME -e STK_PASSWORD=CHANGE_ME -e STK_LOGIN_REQUIRED=true ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r3
+docker run -d --name supertuxkart-gsa-test -p 2757:2757/udp -p 2759:2759/udp -v {container.home_root}/serverfiles:C:/serverfiles -e STK_USERNAME=CHANGE_ME -e STK_PASSWORD=CHANGE_ME -e STK_LOGIN_REQUIRED=true ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r4
