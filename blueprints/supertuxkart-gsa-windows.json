@@ -14,11 +14,12 @@
     },
     "image": {
       "name": "ghcr.io/twistedbobross/supertuxkart-gsa-windows",
-      "tag": "1.5-ltsc2022-x86_64-r2"
+      "tag": "1.5-ltsc2022_x86_64-r3"
     },
     "envs": {
       "STK_USERNAME": "{config_parameter id=\"stk_username\"}",
-      "STK_PASSWORD": "{config_parameter id=\"stk_password\"}"
+      "STK_PASSWORD": "{config_parameter id=\"stk_password\"}",
+      "STK_LOGIN_REQUIRED": "{config_parameter id=\"stk_login_required\"}"
     },
     "mounts": {
       "{container.home_root}/serverfiles": "C:/serverfiles"
@@ -51,72 +52,18 @@
         }
       },
       "parameters": {
-        "stk_username": {
-          "name": "STK Account Username",
-          "info": "Optional. Required only when wan_server is true and you want public STK online listing.",
-          "type": "text",
-          "content": ""
-        },
-        "stk_password": {
-          "name": "STK Account Password",
-          "info": "Optional. Used by Start.ps1 for initial STK login before launching the server.",
-          "type": "text",
-          "content": ""
-        },
-        "wan_server": {
-          "name": "WAN/Public Server",
-          "info": "true lists as a WAN server and requires a valid STK account. false is best for first tests.",
-          "type": "text",
-          "content": "false"
-        },
-        "server_mode": {
-          "name": "Server Mode",
-          "info": "0 normal race GP, 1 time trial GP, 3 normal race, 4 time trial, 6 soccer, 7 free-for-all, 8 capture the flag.",
-          "type": "text",
-          "content": "3"
-        },
-        "server_difficulty": {
-          "name": "Difficulty",
-          "info": "0 beginner, 1 intermediate, 2 expert, 3 supertux.",
-          "type": "text",
-          "content": "0"
-        },
-        "private_server_password": {
-          "name": "Private Server Password",
-          "info": "Leave blank for public access.",
-          "type": "text",
-          "content": ""
-        },
-        "motd": {
-          "name": "Message Of The Day",
-          "info": "Short lobby message. XML-escape special characters if editing directly.",
-          "type": "text",
-          "content": "Welcome to {gameserver.list_name}!"
-        },
-        "track_voting": {
-          "name": "Track Voting",
-          "info": "true lets players vote tracks. false makes the server choose randomly.",
-          "type": "text",
-          "content": "true"
-        },
-        "owner_less": {
-          "name": "Ownerless Lobby",
-          "info": "true removes the lobby owner role and relies on automatic start behavior.",
-          "type": "text",
-          "content": "false"
-        },
-        "server_configurable": {
-          "name": "Lobby Configurable",
-          "info": "true lets the server owner change mode/difficulty in lobby where supported.",
-          "type": "text",
-          "content": "false"
-        },
-        "live_spectate": {
-          "name": "Live Spectate",
-          "info": "true allows live join/spectate in supported modes.",
-          "type": "text",
-          "content": "true"
-        }
+        "stk_username": { "name": "STK Account Username", "info": "Optional. Required only when wan_server is true and you want public STK online listing.", "type": "text", "content": "" },
+        "stk_password": { "name": "STK Account Password", "info": "Optional. Used by Start.ps1 for initial STK login before launching the server.", "type": "text", "content": "" },
+        "wan_server": { "name": "WAN/Public Server", "info": "true lists as a WAN server and requires a valid STK account. false is best for first tests.", "type": "text", "content": "false" },
+        "stk_login_required": { "name": "Require STK Login", "info": "Set true only when WAN/Public Server is true and invalid STK credentials should stop the server.", "type": "text", "content": "false" },
+        "server_mode": { "name": "Server Mode", "info": "0 normal race GP, 1 time trial GP, 3 normal race, 4 time trial, 6 soccer, 7 free-for-all, 8 capture the flag.", "type": "text", "content": "3" },
+        "server_difficulty": { "name": "Difficulty", "info": "0 beginner, 1 intermediate, 2 expert, 3 supertux.", "type": "text", "content": "0" },
+        "private_server_password": { "name": "Private Server Password", "info": "Leave blank for public access.", "type": "text", "content": "" },
+        "motd": { "name": "Message Of The Day", "info": "Short lobby message. XML-escape special characters if editing directly.", "type": "text", "content": "Welcome to {gameserver.list_name}!" },
+        "track_voting": { "name": "Track Voting", "info": "true lets players vote tracks. false makes the server choose randomly.", "type": "text", "content": "true" },
+        "owner_less": { "name": "Ownerless Lobby", "info": "true removes the lobby owner role and relies on automatic start behavior.", "type": "text", "content": "false" },
+        "server_configurable": { "name": "Lobby Configurable", "info": "true lets the server owner change mode/difficulty in lobby where supported.", "type": "text", "content": "false" },
+        "live_spectate": { "name": "Live Spectate", "info": "true allows live join/spectate in supported modes.", "type": "text", "content": "true" }
       }
     }
   }
