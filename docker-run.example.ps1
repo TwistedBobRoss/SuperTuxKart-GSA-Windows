@@ -1,4 +1,4 @@
-$Image = "ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r3"
+$Image = "ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r4"
 $ContainerName = "twisted-supertuxkart"
 $ServerFiles = "C:\stk-test\serverfiles"
 
