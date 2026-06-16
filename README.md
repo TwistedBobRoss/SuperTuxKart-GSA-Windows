@@ -23,7 +23,7 @@ The easiest path is to use the included GitHub Actions workflow:
 The workflow publishes these tags to GitHub Container Registry:
 
 ```text
-ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r5
+ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r6
 ghcr.io/twistedbobross/supertuxkart-gsa-windows:latest
 ```
 
@@ -34,7 +34,7 @@ After the first successful build, make sure the GHCR package is public if GSA wi
 Run this on a Windows Docker host using Windows containers:
 
 ```powershell
-docker build -t ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r5 .
+docker build -t ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r6 .
 ```
 
 ## Test
@@ -65,7 +65,7 @@ If you created a server from an older command where `STK_USERNAME` and `STK_PASS
 GSA pulls images from a registry. After testing, push the image to GitHub Container Registry:
 
 ```powershell
-docker push ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r5
+docker push ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r6
 ```
 
 Then import `blueprints/supertuxkart-gsa-windows.json` in GameServerApp.
@@ -75,7 +75,7 @@ Then import `blueprints/supertuxkart-gsa-windows.json` in GameServerApp.
 - Main server port: UDP `2759`.
 - Discovery port: UDP `2757`.
 - Public/WAN listing requires an STK online account. Fill `STK_USERNAME` and `STK_PASSWORD`, set `wan_server=true`, and set `STK_LOGIN_REQUIRED=true` if a bad login should stop the server.
-- r5 launches STK with `--no-graphics`, masks `--password` in wrapper logs, and waits on the actual STK process so a quick exit is treated as a failed server start instead of a false success.
+- r6 launches STK with `--no-graphics --no-sound`, masks `--password` in wrapper logs, accepts the expected no-exit-code behavior from the one-shot `--init-user` login command, and still treats a quick server exit as a failed server start.
 - The image explicitly uses the x86_64 SuperTuxKart Windows binary from the combined Windows release archive.
 - The initial version uses the official Windows release binary, not a dedicated server-only Windows build.
 - If the official binary still refuses to run headless inside a Windows container, the next step is building SuperTuxKart from source with `SERVER_ONLY=ON`.
