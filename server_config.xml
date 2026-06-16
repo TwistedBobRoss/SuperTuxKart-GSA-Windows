@@ -10,7 +10,7 @@
     <enable-console value="false" />
     <server-max-players value="{gameserver.slot_limit}" />
     <private-server-password value='{config_parameter id="private_server_password"}' />
-    <motd value='{config_parameter id="motd"}' />
+    <motd value="Welcome to {gameserver.list_name}!" />
     <chat value="true" />
     <chat-consecutive-interval value="8" />
     <track-voting value='{config_parameter id="track_voting"}' />
