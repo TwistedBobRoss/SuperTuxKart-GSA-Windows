@@ -51,7 +51,11 @@ function Invoke-Stk {
 
     $duration = ((Get-Date) - $started).TotalSeconds
     if ($null -eq $process.ExitCode) {
-        throw "SuperTuxKart process exited after $([math]::Round($duration, 1)) seconds without reporting an exit code."
+        if ($ExpectLongRunning) {
+            throw "SuperTuxKart server process exited after $([math]::Round($duration, 1)) seconds without reporting an exit code."
+        }
+        Write-Warning "SuperTuxKart one-shot command exited after $([math]::Round($duration, 1)) seconds without reporting an exit code; treating this as success."
+        return 0
     }
 
     if ($ExpectLongRunning -and $duration -lt 10) {
@@ -81,7 +85,7 @@ if ($null -ne $env:STK_LOGIN_REQUIRED) {
 $loginRequired = @("true", "1", "yes") -contains $loginRequiredValue
 
 if ((Test-UsableEnvValue $username) -and (Test-UsableEnvValue $password)) {
-    $exitCode = Invoke-Stk @("--no-graphics", "--init-user", "--login=$username", "--password=$password")
+    $exitCode = Invoke-Stk @("--no-graphics", "--no-sound", "--init-user", "--login=$username", "--password=$password")
     if ($exitCode -ne 0) {
         $message = "SuperTuxKart account initialization failed with exit code $exitCode"
         if ($loginRequired) {
@@ -94,5 +98,5 @@ else {
     Write-Host "Skipping SuperTuxKart account initialization because usable STK credentials were not provided."
 }
 
-$exitCode = Invoke-Stk @("--no-graphics", "--server-config=$config") -ExpectLongRunning
+$exitCode = Invoke-Stk @("--no-graphics", "--no-sound", "--server-config=$config") -ExpectLongRunning
 exit $exitCode
