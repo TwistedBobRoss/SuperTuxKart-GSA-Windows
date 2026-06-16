@@ -123,6 +123,101 @@ function Get-EnvInt {
     return $DefaultValue
 }
 
+function Convert-ToBoolString {
+    param(
+        [string]$Value,
+        [string]$DefaultValue
+    )
+
+    if (-not (Test-UsableEnvValue $Value)) {
+        return $DefaultValue
+    }
+
+    switch ($Value.Trim().ToLowerInvariant()) {
+        { $_ -in @("true", "1", "yes", "on") } { return "true" }
+        { $_ -in @("false", "0", "no", "off") } { return "false" }
+        default {
+            Write-Warning "Could not parse boolean value '$Value'; using '$DefaultValue'."
+            return $DefaultValue
+        }
+    }
+}
+
+function Set-ServerConfigValue {
+    param(
+        [xml]$ServerConfig,
+        [string]$ElementName,
+        [string]$Value
+    )
+
+    $node = $ServerConfig.SelectSingleNode("/server-config/$ElementName")
+    if (-not $node) {
+        $node = $ServerConfig.CreateElement($ElementName)
+        $ServerConfig.DocumentElement.AppendChild($node) | Out-Null
+    }
+
+    $attribute = $node.Attributes["value"]
+    if (-not $attribute) {
+        $attribute = $ServerConfig.CreateAttribute("value")
+        $node.Attributes.Append($attribute) | Out-Null
+    }
+
+    $attribute.Value = $Value
+}
+
+function Normalize-ServerConfig {
+    param(
+        [int]$AiRacers,
+        [bool]$HasUsableCredentials,
+        [bool]$LoginRequired
+    )
+
+    [xml]$serverConfig = Get-Content -LiteralPath $config -Raw
+
+    $wanDefault = if ($HasUsableCredentials -or $LoginRequired) { "true" } else { "false" }
+    $aiDefault = if ($AiRacers -gt 0) { "true" } else { "false" }
+
+    $booleanDefaults = @{
+        "wan-server" = $wanDefault
+        "soccer-goal-target" = "false"
+        "enable-console" = "false"
+        "chat" = "true"
+        "track-voting" = "true"
+        "validating-player" = "true"
+        "firewalled-server" = "true"
+        "ipv6-connection" = "true"
+        "owner-less" = "false"
+        "auto-end" = "false"
+        "team-choosing" = "true"
+        "strict-players" = "false"
+        "ranked" = "false"
+        "server-configurable" = "false"
+        "live-spectate" = "true"
+        "kick-high-ping-players" = "false"
+        "high-ping-workaround" = "true"
+        "sql-management" = "false"
+        "ai-handling" = $aiDefault
+        "ai-anywhere" = "false"
+    }
+
+    $envOverrides = @{
+        "wan-server" = $env:STK_WAN_SERVER
+        "owner-less" = $env:STK_OWNER_LESS
+        "ai-handling" = $env:STK_AI_HANDLING
+    }
+
+    foreach ($key in $booleanDefaults.Keys) {
+        $currentNode = $serverConfig.SelectSingleNode("/server-config/$key")
+        $currentValue = if ($currentNode) { [string]$currentNode.value } else { "" }
+        if ($envOverrides.ContainsKey($key) -and (Test-UsableEnvValue $envOverrides[$key])) {
+            $currentValue = $envOverrides[$key]
+        }
+        Set-ServerConfigValue $serverConfig $key (Convert-ToBoolString $currentValue $booleanDefaults[$key])
+    }
+
+    $serverConfig.Save($config)
+}
+
 $username = $env:STK_USERNAME
 $password = $env:STK_PASSWORD
 $loginRequiredValue = ""
@@ -130,8 +225,15 @@ if ($null -ne $env:STK_LOGIN_REQUIRED) {
     $loginRequiredValue = $env:STK_LOGIN_REQUIRED.Trim().ToLowerInvariant()
 }
 $loginRequired = @("true", "1", "yes") -contains $loginRequiredValue
+$hasUsableCredentials = (Test-UsableEnvValue $username) -and (Test-UsableEnvValue $password)
+$aiRacers = Get-EnvInt "STK_AI_RACERS" 0
+if ($aiRacers -lt 0) {
+    $aiRacers = 0
+}
 
-if ((Test-UsableEnvValue $username) -and (Test-UsableEnvValue $password)) {
+Normalize-ServerConfig $aiRacers $hasUsableCredentials $loginRequired
+
+if ($hasUsableCredentials) {
     $exitCode = Invoke-Stk @("--no-graphics", "--no-sound", "--init-user", "--login=$username", "--password=$password")
     if ($exitCode -ne 0) {
         $message = "SuperTuxKart account initialization failed with exit code $exitCode"
@@ -153,10 +255,6 @@ if ((-not [int]::TryParse($serverPortValue, [ref]$serverPort)) -or $serverPort -
 }
 
 $serverPassword = Get-ServerConfigValue "private-server-password" ""
-$aiRacers = Get-EnvInt "STK_AI_RACERS" 0
-if ($aiRacers -lt 0) {
-    $aiRacers = 0
-}
 
 $serverStarted = Get-Date
 $serverProcess = Start-StkProcess @("--no-graphics", "--no-sound", "--server-config=$config")
