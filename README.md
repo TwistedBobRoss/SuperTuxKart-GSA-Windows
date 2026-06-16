@@ -29,15 +29,15 @@ This image is intended for **Windows container hosts**, such as Windows Server 2
 - GSA config parameters wired into Docker environment variables
 - Startup wrapper that normalizes boolean config values before launching STK
 
-## GameServerApp Setup
+## GameServerApp Marketplace Setup
 
-The easiest path is to import the blueprint:
+Download the published blueprint from the GameServerApp Marketplace, then create a server from that blueprint and fill in the config parameters.
+
+If you need the raw blueprint JSON for manual import or review, it is available here:
 
 ```text
 https://raw.githubusercontent.com/TwistedBobRoss/SuperTuxKart-GSA-Windows/main/blueprints/supertuxkart-gsa-windows.json
 ```
-
-After importing, create a server from the blueprint and fill in the config parameters.
 
 Recommended public/WAN setup:
 
