@@ -5,7 +5,7 @@ Windows-container experiment for running a SuperTuxKart dedicated server through
 This repo contains:
 
 - `Dockerfile` - builds a Windows Server Core image using the official SuperTuxKart Windows release zip.
-- `Start.ps1` - initializes an optional STK online account, then starts the server from `server_config.xml`.
+- `Start.ps1` - initializes an optional STK online account, normalizes config booleans, starts the server, and can launch local network AI racers.
 - `server_config.xml` - default editable STK server config.
 - `docker-run.example.ps1` - local test command.
 - `docker-run.gsa-import.txt` - simple GSA Docker import seed command.
@@ -23,7 +23,7 @@ The easiest path is to use the included GitHub Actions workflow:
 The workflow publishes these tags to GitHub Container Registry:
 
 ```text
-ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r6
+ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r8
 ghcr.io/twistedbobross/supertuxkart-gsa-windows:latest
 ```
 
@@ -34,7 +34,7 @@ After the first successful build, make sure the GHCR package is public if GSA wi
 Run this on a Windows Docker host using Windows containers:
 
 ```powershell
-docker build -t ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r6 .
+docker build -t ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r8 .
 ```
 
 ## Test
@@ -46,7 +46,7 @@ docker logs twisted-supertuxkart
 
 ## GSA Import
 
-Best option: import `blueprints/supertuxkart-gsa-windows.json`. That file already wires the STK account parameters into Docker environment variables.
+Best option: import `blueprints/supertuxkart-gsa-windows.json`. That file already wires the STK account, lobby, and AI parameters into Docker environment variables.
 
 If you use GameServerApp's **Import Custom Docker container** flow, paste the simple command from `docker-run.gsa-import.txt`. It is intentionally not fully parameterized, because the Docker run import parser may ignore quoted `{config_parameter ...}` values. After import, edit **Docker > Environment variables** in the blueprint:
 
@@ -54,6 +54,10 @@ If you use GameServerApp's **Import Custom Docker container** flow, paste the si
 STK_USERNAME = {config_parameter id="stk_username"}
 STK_PASSWORD = {config_parameter id="stk_password"}
 STK_LOGIN_REQUIRED = {config_parameter id="stk_login_required"}
+STK_AI_RACERS = {config_parameter id="ai_racers"}
+STK_WAN_SERVER = {config_parameter id="wan_server"}
+STK_OWNER_LESS = {config_parameter id="owner_less"}
+STK_AI_HANDLING = {config_parameter id="ai_handling"}
 ```
 
 For a private test blueprint, you can instead put the literal STK username/password directly in those Docker env rows. Do not publish credentials in a marketplace blueprint.
@@ -65,7 +69,7 @@ If you created a server from an older command where `STK_USERNAME` and `STK_PASS
 GSA pulls images from a registry. After testing, push the image to GitHub Container Registry:
 
 ```powershell
-docker push ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r6
+docker push ghcr.io/twistedbobross/supertuxkart-gsa-windows:1.5-ltsc2022-x86_64-r8
 ```
 
 Then import `blueprints/supertuxkart-gsa-windows.json` in GameServerApp.
@@ -75,7 +79,8 @@ Then import `blueprints/supertuxkart-gsa-windows.json` in GameServerApp.
 - Main server port: UDP `2759`.
 - Discovery port: UDP `2757`.
 - Public/WAN listing requires an STK online account. Fill `STK_USERNAME` and `STK_PASSWORD`, set `wan_server=true`, and set `STK_LOGIN_REQUIRED=true` if a bad login should stop the server.
-- r6 launches STK with `--no-graphics --no-sound`, masks `--password` in wrapper logs, accepts the expected no-exit-code behavior from the one-shot `--init-user` login command, and still treats a quick server exit as a failed server start.
+- AI racers are optional. Set `AI Racers` above `0` and set `AI Handling` to `true`; the wrapper starts a local headless `--network-ai` client after the server starts.
+- r8 normalizes common boolean config values before STK starts, which prevents GSA values such as `True`, `False`, `1`, or placeholder leftovers from blocking lobby ownership/start behavior.
 - The image explicitly uses the x86_64 SuperTuxKart Windows binary from the combined Windows release archive.
 - The initial version uses the official Windows release binary, not a dedicated server-only Windows build.
 - If the official binary still refuses to run headless inside a Windows container, the next step is building SuperTuxKart from source with `SERVER_ONLY=ON`.
