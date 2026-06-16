@@ -53,5 +53,6 @@
     <player-reports-expired-days value="3" />
     <ip-geolocation-table value="ip_mapping" />
     <ipv6-geolocation-table value="ipv6_mapping" />
-    <ai-handling value="false" />
+    <ai-handling value='{config_parameter id="ai_handling"}' />
+    <ai-anywhere value="false" />
 </server-config>
