@@ -44,12 +44,12 @@ jobs:
         run: |
           docker build --isolation=process `
             --file Dockerfile.custom-ai `
-            --tag ghcr.io/${{ github.repository_owner }}/supertuxkart-gsa-windows:custom-ai-names `
-            --tag ghcr.io/${{ github.repository_owner }}/supertuxkart-gsa-windows:custom-ai-names-${{ github.sha }} `
+            --tag ghcr.io/twistedbobross/supertuxkart-gsa-windows:custom-ai-names `
+            --tag ghcr.io/twistedbobross/supertuxkart-gsa-windows:custom-ai-names-${{ github.sha }} `
             .
 
       - name: Publish the custom image tags
         shell: powershell
         run: |
-          docker push ghcr.io/${{ github.repository_owner }}/supertuxkart-gsa-windows:custom-ai-names
-          docker push ghcr.io/${{ github.repository_owner }}/supertuxkart-gsa-windows:custom-ai-names-${{ github.sha }}
+          docker push ghcr.io/twistedbobross/supertuxkart-gsa-windows:custom-ai-names
+          docker push ghcr.io/twistedbobross/supertuxkart-gsa-windows:custom-ai-names-${{ github.sha }}
