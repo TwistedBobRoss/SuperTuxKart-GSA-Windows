@@ -16,6 +16,8 @@ ENV VS_BUILDTOOLS_URL=${VS_BUILDTOOLS_URL}
 
 WORKDIR C:/build
 
+COPY scripts/Apply-TkgAiNames.ps1 C:/build/Apply-TkgAiNames.ps1
+
 # Install the MSVC/CMake toolchain needed by STK's documented Windows build.
 RUN New-Item -ItemType Directory -Force -Path C:/temp, C:/build | Out-Null; `
     Invoke-WebRequest -UseBasicParsing -Uri $env:VS_BUILDTOOLS_URL -OutFile C:/temp/vs_buildtools.exe; `
@@ -23,8 +25,7 @@ RUN New-Item -ItemType Directory -Force -Path C:/temp, C:/build | Out-Null; `
     if ($process.ExitCode -notin 0,3010) { throw "Visual Studio Build Tools installation failed with exit code $($process.ExitCode)." }; `
     Remove-Item -Force C:/temp/vs_buildtools.exe
 
-# Download STK source and the official Windows dependency bundle, then apply
-# the branch-local TKG AI naming change before compiling the executable.
+# Download STK source and the official Windows dependency bundle.
 RUN Invoke-WebRequest -UseBasicParsing -Uri $env:STK_SOURCE_URL -OutFile C:/temp/stk-source.zip; `
     Expand-Archive -Path C:/temp/stk-source.zip -DestinationPath C:/build -Force; `
     $source = Get-ChildItem -Path C:/build -Directory | Where-Object { $_.Name -like 'stk-code-*' } | Select-Object -First 1; `
@@ -34,40 +35,9 @@ RUN Invoke-WebRequest -UseBasicParsing -Uri $env:STK_SOURCE_URL -OutFile C:/temp
     Expand-Archive -Path C:/temp/stk-deps.zip -DestinationPath C:/build/stk-code -Force; `
     & 'C:\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe' --version | Out-Host
 
-RUN $sourceFile = 'C:/build/stk-code/src/network/protocols/server_lobby.cpp'; `
-    $text = Get-Content -Raw -LiteralPath $sourceFile; `
-    $old = @'
-#ifdef SERVER_ONLY
-            core::stringw name = L"Bot";
-#else
-            core::stringw name = _("Bot");
-#endif
-            name += core::stringw(" ") + StringUtils::toWString(i + 1);
-'@; `
-    $new = @'
-            static const wchar_t* const TKG_AI_NAMES[] =
-            {
-                L"Tekwhisker",
-                L"Obelisk Outlaw",
-                L"Raptor Rumbler",
-                L"Cimmerian Claw",
-                L"Paldust Pouncer",
-                L"Runeclaw Rider",
-                L"Yggdrift",
-                L"Frostmead Fury",
-                L"Fiberfang",
-                L"Tux Turbo"
-            };
-            constexpr unsigned TKG_AI_NAME_COUNT =
-                sizeof(TKG_AI_NAMES) / sizeof(TKG_AI_NAMES[0]);
-            core::stringw name;
-            if (i < TKG_AI_NAME_COUNT)
-                name = TKG_AI_NAMES[i];
-            else
-                name = L"TKG Racer " + StringUtils::toWString(i + 1);
-'@; `
-    if (-not $text.Contains($old)) { throw 'The expected STK Bot-name source block was not found; review the upstream STK source before rebuilding.' }; `
-    Set-Content -LiteralPath $sourceFile -Value $text.Replace($old, $new) -NoNewline
+# Apply the AI-name change from a script file so Docker never parses C++ source
+# embedded in a PowerShell here-string.
+RUN & 'C:\build\Apply-TkgAiNames.ps1' -SourceFile 'C:\build\stk-code\src\network\protocols\server_lobby.cpp'
 
 RUN cmd /S /C "call C:\BuildTools\Common7\Tools\VsDevCmd.bat -arch=x64 && cd /d C:\build\stk-code && mkdir build && cd build && C:\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe .. -G \"Visual Studio 17 2022\" -A x64 -DCHECK_ASSETS=OFF && C:\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe --build . --config Release --target supertuxkart"
 
