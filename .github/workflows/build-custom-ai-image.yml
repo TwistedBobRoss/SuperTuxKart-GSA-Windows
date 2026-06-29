@@ -18,16 +18,25 @@ permissions:
 
 jobs:
   build-and-push:
-    runs-on: windows-2022
+    # GitHub-hosted Windows runners expose the Docker CLI but do not provide
+    # the Windows-container Docker daemon required by servercore:ltsc2022.
+    # Register a self-hosted Windows runner with these labels on the machine
+    # that has Docker configured for Windows containers.
+    runs-on: [self-hosted, windows, x64, windows-containers]
     steps:
       - name: Check out custom image branch
         uses: actions/checkout@v4
 
-      - name: Confirm Windows container mode
+      - name: Verify Windows-container Docker daemon
         shell: powershell
         run: |
+          $ErrorActionPreference = 'Stop'
           docker version
-          docker info
+          $osType = docker info --format '{{.OSType}}'
+          if ($osType -ne 'windows') {
+            throw "This runner is using '$osType' containers. Switch Docker to Windows containers before running this custom image build."
+          }
+          docker info --format 'Docker daemon OS type: {{.OSType}}'
 
       - name: Sign in to GitHub Container Registry
         shell: powershell
