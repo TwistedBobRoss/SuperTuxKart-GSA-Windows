@@ -24,16 +24,18 @@ It uses the separate `custom-ai-names` image tag. The original blueprint and its
 
 ## First ten local AI racer names
 
-1. Whiskers Ascended — Ark Survival Ascended PvE
-2. Twisted Purrgatory — Ark Survival Ascended PvP
-3. Kitten Colony — Ark Survival Ascended Lost Colony
-4. Frayed Reach — Chronicles of Twisted Fibers
-5. Exiles of TKG — Conan Exiles
-6. Twisted Pals — Palworld
-7. Echoes of Valheim — Valheim
-8. Shadows of Valheim — Valheim
-9. Twisted Fibers — Fibercraft community
-10. TKG Turbo Tux — SuperTuxKart / Twisted Kittens Gaming
+These are character-style names inspired by TKG and its Ark, Conan, Palworld, Valheim, Fibercraft, and SuperTuxKart communities. They are deliberately **not** copies of server names.
+
+1. Tekwhisker — Tek / Ark inspiration
+2. Obelisk Outlaw — Ark obelisk inspiration
+3. Raptor Rumbler — Ark creature/racing inspiration
+4. Cimmerian Claw — Conan Exiles inspiration
+5. Paldust Pouncer — Palworld inspiration
+6. Runeclaw Rider — Valheim rune/saga inspiration
+7. Yggdrift — Valheim world-tree/racing inspiration
+8. Frostmead Fury — Valheim biome/mead inspiration
+9. Fiberfang — Twisted Fibers / Fibercraft inspiration
+10. Tux Turbo — SuperTuxKart and TKG inspiration
 
 When **AI Racers** is greater than ten, additional racers are named `TKG Racer 11`, `TKG Racer 12`, and so on.
 
