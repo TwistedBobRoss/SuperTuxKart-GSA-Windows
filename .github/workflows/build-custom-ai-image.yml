@@ -1,0 +1,50 @@
+name: Build custom TKG AI image
+
+on:
+  push:
+    branches:
+      - custom-ai-names
+    paths:
+      - Dockerfile.custom-ai
+      - Start.ps1
+      - server_config.xml
+      - patches/**
+      - .github/workflows/build-custom-ai-image.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-push:
+    runs-on: windows-2022
+    steps:
+      - name: Check out custom image branch
+        uses: actions/checkout@v4
+
+      - name: Confirm Windows container mode
+        shell: powershell
+        run: |
+          docker version
+          docker info
+
+      - name: Sign in to GitHub Container Registry
+        shell: powershell
+        run: |
+          $env:GITHUB_TOKEN | docker login ghcr.io -u $env:GITHUB_ACTOR --password-stdin
+
+      - name: Build the separate custom image
+        shell: powershell
+        run: |
+          docker build --isolation=process `
+            --file Dockerfile.custom-ai `
+            --tag ghcr.io/${{ github.repository_owner }}/supertuxkart-gsa-windows:custom-ai-names `
+            --tag ghcr.io/${{ github.repository_owner }}/supertuxkart-gsa-windows:custom-ai-names-${{ github.sha }} `
+            .
+
+      - name: Publish the custom image tags
+        shell: powershell
+        run: |
+          docker push ghcr.io/${{ github.repository_owner }}/supertuxkart-gsa-windows:custom-ai-names
+          docker push ghcr.io/${{ github.repository_owner }}/supertuxkart-gsa-windows:custom-ai-names-${{ github.sha }}
