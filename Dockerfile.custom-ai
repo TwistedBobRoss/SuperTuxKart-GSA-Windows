@@ -17,6 +17,7 @@ ENV VS_BUILDTOOLS_URL=${VS_BUILDTOOLS_URL}
 WORKDIR C:/build
 
 COPY scripts/Apply-TkgAiNames.ps1 C:/build/Apply-TkgAiNames.ps1
+COPY scripts/Build-SuperTuxKart.ps1 C:/build/Build-SuperTuxKart.ps1
 
 # Install the MSVC/CMake toolchain needed by STK's documented Windows build.
 RUN New-Item -ItemType Directory -Force -Path C:/temp, C:/build | Out-Null; `
@@ -35,11 +36,10 @@ RUN Invoke-WebRequest -UseBasicParsing -Uri $env:STK_SOURCE_URL -OutFile C:/temp
     Expand-Archive -Path C:/temp/stk-deps.zip -DestinationPath C:/build/stk-code -Force; `
     & 'C:\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe' --version | Out-Host
 
-# Apply the AI-name change from a script file so Docker never parses C++ source
-# embedded in a PowerShell here-string.
+# Apply named-racer source change and compile through helper scripts so PowerShell
+# does not parse cmd.exe's && operators.
 RUN & 'C:\build\Apply-TkgAiNames.ps1' -SourceFile 'C:\build\stk-code\src\network\protocols\server_lobby.cpp'
-
-RUN cmd /S /C "call C:\BuildTools\Common7\Tools\VsDevCmd.bat -arch=x64 && cd /d C:\build\stk-code && mkdir build && cd build && C:\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe .. -G \"Visual Studio 17 2022\" -A x64 -DCHECK_ASSETS=OFF && C:\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe --build . --config Release --target supertuxkart"
+RUN & 'C:\build\Build-SuperTuxKart.ps1' -SourceDirectory 'C:\build\stk-code' -BuildDirectory 'C:\build\stk-code\build'
 
 FROM mcr.microsoft.com/windows/servercore:ltsc2022
 
