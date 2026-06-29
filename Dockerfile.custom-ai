@@ -20,8 +20,7 @@ RUN New-Item -ItemType Directory -Force -Path C:/temp, C:/build | Out-Null; `
     Remove-Item -Force C:/temp/vs_buildtools.exe
 
 # Download STK source and the official Windows dependency bundle, then apply
-# the branch-local TKG AI naming patch before compiling the executable.
-COPY patches/tkg-ai-racer-names.patch C:/build/tkg-ai-racer-names.patch
+# the branch-local TKG AI naming change before compiling the executable.
 RUN Invoke-WebRequest -UseBasicParsing -Uri $env:STK_SOURCE_URL -OutFile C:/temp/stk-source.zip; `
     Expand-Archive -Path C:/temp/stk-source.zip -DestinationPath C:/build -Force; `
     $source = Get-ChildItem -Path C:/build -Directory | Where-Object { $_.Name -like 'stk-code-*' } | Select-Object -First 1; `
@@ -44,16 +43,16 @@ RUN $sourceFile = 'C:/build/stk-code/src/network/protocols/server_lobby.cpp'; `
     $new = @'
             static const wchar_t* const TKG_AI_NAMES[] =
             {
-                L"Twisted Tux",
-                L"Whisker Wrecker",
-                L"Clawdia",
-                L"Turbo Tabby",
-                L"Purrgatory Pete",
-                L"Meowdrift",
-                L"Chaos Kitten",
-                L"Midnight Paws",
-                L"Feral Fiona",
-                L"Catastrophe"
+                L"Whiskers Ascended",
+                L"Twisted Purrgatory",
+                L"Kitten Colony",
+                L"Frayed Reach",
+                L"Exiles of TKG",
+                L"Twisted Pals",
+                L"Echoes of Valheim",
+                L"Shadows of Valheim",
+                L"Twisted Fibers",
+                L"TKG Turbo Tux"
             };
             constexpr unsigned TKG_AI_NAME_COUNT =
                 sizeof(TKG_AI_NAMES) / sizeof(TKG_AI_NAMES[0]);
