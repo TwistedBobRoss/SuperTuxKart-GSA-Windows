@@ -1,3 +1,4 @@
+# escape=`
 # Separate, source-built image for TKG named SuperTuxKart network AI racers.
 # This file is intentionally used only from the custom-ai-names branch.
 
