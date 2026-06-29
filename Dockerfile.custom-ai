@@ -9,6 +9,9 @@ ARG STK_VERSION=1.5
 ARG STK_SOURCE_URL=https://github.com/supertuxkart/stk-code/archive/refs/tags/1.5.zip
 ARG STK_DEPS_URL=https://github.com/supertuxkart/dependencies/releases/download/preview/dependencies-win-x86_64.zip
 ARG VS_BUILDTOOLS_URL=https://aka.ms/vs/17/release/vs_buildtools.exe
+ENV STK_SOURCE_URL=${STK_SOURCE_URL}
+ENV STK_DEPS_URL=${STK_DEPS_URL}
+ENV VS_BUILDTOOLS_URL=${VS_BUILDTOOLS_URL}
 
 WORKDIR C:/build
 
