@@ -43,16 +43,16 @@ RUN $sourceFile = 'C:/build/stk-code/src/network/protocols/server_lobby.cpp'; `
     $new = @'
             static const wchar_t* const TKG_AI_NAMES[] =
             {
-                L"Whiskers Ascended",
-                L"Twisted Purrgatory",
-                L"Kitten Colony",
-                L"Frayed Reach",
-                L"Exiles of TKG",
-                L"Twisted Pals",
-                L"Echoes of Valheim",
-                L"Shadows of Valheim",
-                L"Twisted Fibers",
-                L"TKG Turbo Tux"
+                L"Tekwhisker",
+                L"Obelisk Outlaw",
+                L"Raptor Rumbler",
+                L"Cimmerian Claw",
+                L"Paldust Pouncer",
+                L"Runeclaw Rider",
+                L"Yggdrift",
+                L"Frostmead Fury",
+                L"Fiberfang",
+                L"Tux Turbo"
             };
             constexpr unsigned TKG_AI_NAME_COUNT =
                 sizeof(TKG_AI_NAMES) / sizeof(TKG_AI_NAMES[0]);
