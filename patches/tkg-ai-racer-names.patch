@@ -1,0 +1,51 @@
+diff --git a/src/network/protocols/server_lobby.cpp b/src/network/protocols/server_lobby.cpp
+index 0000000..0000000 100644
+--- a/src/network/protocols/server_lobby.cpp
++++ b/src/network/protocols/server_lobby.cpp
+@@ -2921,14 +2921,35 @@ void ServerLobby::connectionRequested(Event* event)
+         }
+         for (unsigned i = 0; i < ai_add; i++)
+         {
++            // TKG custom network-AI display names. Keep this list deterministic
++            // so each slot consistently receives the same name. Any AI count
++            // above the named list uses a numbered fallback.
++            static const wchar_t* const TKG_AI_NAMES[] =
++            {
++                L"Twisted Tux",
++                L"Whisker Wrecker",
++                L"Clawdia",
++                L"Turbo Tabby",
++                L"Purrgatory Pete",
++                L"Meowdrift",
++                L"Chaos Kitten",
++                L"Midnight Paws",
++                L"Feral Fiona",
++                L"Catastrophe"
++            };
++
++            constexpr unsigned TKG_AI_NAME_COUNT =
++                sizeof(TKG_AI_NAMES) / sizeof(TKG_AI_NAMES[0]);
++
++            core::stringw name;
++            if (i < TKG_AI_NAME_COUNT)
++            {
++                name = TKG_AI_NAMES[i];
++            }
++            else
++            {
++                name = L"TKG Racer ";
++                name += StringUtils::toWString(i + 1);
++            }
++
++#if 0
+ #ifdef SERVER_ONLY
+-            core::stringw name = L"Bot";
++            core::stringw name = L"Bot";
+ #else
+             core::stringw name = _("Bot");
+ #endif
+             name += core::stringw(" ") + StringUtils::toWString(i + 1);
++#endif
+             
+             m_ai_profiles.push_back(std::make_shared<NetworkPlayerProfile>
+                 (peer, name, peer->getHostId(), 0.0f, 0, HANDICAP_NONE,
