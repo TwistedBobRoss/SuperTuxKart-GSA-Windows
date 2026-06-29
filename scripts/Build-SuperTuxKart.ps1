@@ -17,11 +17,9 @@ foreach ($requiredPath in @($vsDevCmd, $cmake, $SourceDirectory)) {
     }
 }
 
-# Keep the whole command in a PowerShell string. This prevents Windows
-# PowerShell 5.1 from interpreting cmd.exe's && separators itself.
-$command = @"
-call "$vsDevCmd" -arch=x64 && if not exist "$BuildDirectory" mkdir "$BuildDirectory" && cd /d "$BuildDirectory" && "$cmake" "$SourceDirectory" -G "Visual Studio 17 2022" -A x64 -DCHECK_ASSETS=OFF && "$cmake" --build . --config Release --target supertuxkart
-"@.Trim()
+# Keep cmd.exe operators inside a PowerShell string. Windows PowerShell 5.1
+# therefore passes && to cmd.exe instead of trying to parse it itself.
+$command = "call `"$vsDevCmd`" -arch=x64 && if not exist `"$BuildDirectory`" mkdir `"$BuildDirectory`" && cd /d `"$BuildDirectory`" && `"$cmake`" `"$SourceDirectory`" -G `"Visual Studio 17 2022`" -A x64 -DCHECK_ASSETS=OFF && `"$cmake`" --build . --config Release --target supertuxkart"
 
 Write-Host "Configuring and building SuperTuxKart from $SourceDirectory"
 & $env:ComSpec /d /s /c $command
