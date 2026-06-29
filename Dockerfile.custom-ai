@@ -74,6 +74,9 @@ FROM mcr.microsoft.com/windows/servercore:ltsc2022
 
 SHELL ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command"]
 
+LABEL org.opencontainers.image.source="https://github.com/TwistedBobRoss/SuperTuxKart-GSA-Windows"
+LABEL org.opencontainers.image.description="Custom SuperTuxKart Windows server image with TKG-themed network AI racer names."
+
 ARG STK_ZIP_URL=https://github.com/supertuxkart/stk-code/releases/download/1.5/SuperTuxKart-1.5-win.zip
 ENV STK_ZIP_URL=${STK_ZIP_URL}
 
