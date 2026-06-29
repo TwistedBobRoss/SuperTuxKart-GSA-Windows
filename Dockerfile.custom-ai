@@ -50,6 +50,8 @@ LABEL org.opencontainers.image.description="Custom SuperTuxKart Windows server i
 
 ARG STK_ZIP_URL=https://github.com/supertuxkart/stk-code/releases/download/1.5/SuperTuxKart-1.5-win.zip
 ENV STK_ZIP_URL=${STK_ZIP_URL}
+ENV SUPERTUXKART_DATADIR=C:/stk/stk-code/build-x86_64
+ENV SUPERTUXKART_ASSETS_DIR=C:/stk/stk-code/build-x86_64/data
 
 WORKDIR C:/stk
 
@@ -65,9 +67,10 @@ RUN New-Item -ItemType Directory -Force -Path C:/temp, C:/stk, C:/serverfiles | 
 
 COPY --from=builder C:/build/stk-code/build/bin/Release/supertuxkart.exe C:/stk/stk-code/build-x86_64/bin/supertuxkart.exe
 COPY Start.ps1 C:/stk/Start.ps1
+COPY scripts/Start-CustomAiDiagnostics.ps1 C:/stk/Start-CustomAiDiagnostics.ps1
 COPY server_config.xml C:/serverfiles/server_config.xml
 
 EXPOSE 2757/udp
 EXPOSE 2759/udp
 
-ENTRYPOINT ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "C:/stk/Start.ps1"]
+ENTRYPOINT ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "C:/stk/Start-CustomAiDiagnostics.ps1"]
