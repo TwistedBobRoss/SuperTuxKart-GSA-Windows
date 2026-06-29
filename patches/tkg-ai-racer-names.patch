@@ -1,5 +1,4 @@
 diff --git a/src/network/protocols/server_lobby.cpp b/src/network/protocols/server_lobby.cpp
-index 0000000..0000000 100644
 --- a/src/network/protocols/server_lobby.cpp
 +++ b/src/network/protocols/server_lobby.cpp
 @@ -2921,14 +2921,35 @@ void ServerLobby::connectionRequested(Event* event)
@@ -11,16 +10,16 @@ index 0000000..0000000 100644
 +            // above the named list uses a numbered fallback.
 +            static const wchar_t* const TKG_AI_NAMES[] =
 +            {
-+                L"Twisted Tux",
-+                L"Whisker Wrecker",
-+                L"Clawdia",
-+                L"Turbo Tabby",
-+                L"Purrgatory Pete",
-+                L"Meowdrift",
-+                L"Chaos Kitten",
-+                L"Midnight Paws",
-+                L"Feral Fiona",
-+                L"Catastrophe"
++                L"Whiskers Ascended",
++                L"Twisted Purrgatory",
++                L"Kitten Colony",
++                L"Frayed Reach",
++                L"Exiles of TKG",
++                L"Twisted Pals",
++                L"Echoes of Valheim",
++                L"Shadows of Valheim",
++                L"Twisted Fibers",
++                L"TKG Turbo Tux"
 +            };
 +
 +            constexpr unsigned TKG_AI_NAME_COUNT =
@@ -39,8 +38,7 @@ index 0000000..0000000 100644
 +
 +#if 0
  #ifdef SERVER_ONLY
--            core::stringw name = L"Bot";
-+            core::stringw name = L"Bot";
+             core::stringw name = L"Bot";
  #else
              core::stringw name = _("Bot");
  #endif
