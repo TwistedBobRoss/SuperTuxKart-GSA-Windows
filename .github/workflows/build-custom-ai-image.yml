@@ -9,7 +9,7 @@ on:
       - Start.ps1
       - server_config.xml
       - patches/**
-      - scripts/Start-WindowsDocker.ps1
+      - scripts/**
       - blueprints/supertuxkart-gsa-windows-custom-ai-names.json
       - .github/workflows/build-custom-ai-image.yml
   workflow_dispatch:
