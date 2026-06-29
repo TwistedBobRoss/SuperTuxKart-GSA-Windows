@@ -1,0 +1,97 @@
+# Separate, source-built image for TKG named SuperTuxKart network AI racers.
+# This file is intentionally used only from the custom-ai-names branch.
+
+FROM mcr.microsoft.com/windows/servercore:ltsc2022 AS builder
+
+SHELL ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command"]
+
+ARG STK_VERSION=1.5
+ARG STK_SOURCE_URL=https://github.com/supertuxkart/stk-code/archive/refs/tags/1.5.zip
+ARG STK_DEPS_URL=https://github.com/supertuxkart/dependencies/releases/download/preview/dependencies-win-x86_64.zip
+ARG VS_BUILDTOOLS_URL=https://aka.ms/vs/17/release/vs_buildtools.exe
+
+WORKDIR C:/build
+
+# Install the MSVC/CMake toolchain needed by STK's documented Windows build.
+RUN New-Item -ItemType Directory -Force -Path C:/temp, C:/build | Out-Null; `
+    Invoke-WebRequest -UseBasicParsing -Uri $env:VS_BUILDTOOLS_URL -OutFile C:/temp/vs_buildtools.exe; `
+    $process = Start-Process -FilePath C:/temp/vs_buildtools.exe -ArgumentList '--quiet --wait --norestart --nocache --installPath C:\BuildTools --add Microsoft.VisualStudio.Workload.VCTools --includeRecommended' -Wait -PassThru; `
+    if ($process.ExitCode -notin 0,3010) { throw "Visual Studio Build Tools installation failed with exit code $($process.ExitCode)." }; `
+    Remove-Item -Force C:/temp/vs_buildtools.exe
+
+# Download STK source and the official Windows dependency bundle, then apply
+# the branch-local TKG AI naming patch before compiling the executable.
+COPY patches/tkg-ai-racer-names.patch C:/build/tkg-ai-racer-names.patch
+RUN Invoke-WebRequest -UseBasicParsing -Uri $env:STK_SOURCE_URL -OutFile C:/temp/stk-source.zip; `
+    Expand-Archive -Path C:/temp/stk-source.zip -DestinationPath C:/build -Force; `
+    $source = Get-ChildItem -Path C:/build -Directory | Where-Object { $_.Name -like 'stk-code-*' } | Select-Object -First 1; `
+    if (-not $source) { throw 'Could not locate extracted SuperTuxKart source.' }; `
+    Rename-Item -Path $source.FullName -NewName 'stk-code'; `
+    Invoke-WebRequest -UseBasicParsing -Uri $env:STK_DEPS_URL -OutFile C:/temp/stk-deps.zip; `
+    Expand-Archive -Path C:/temp/stk-deps.zip -DestinationPath C:/build/stk-code -Force; `
+    & 'C:\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe' --version | Out-Host
+
+RUN $sourceFile = 'C:/build/stk-code/src/network/protocols/server_lobby.cpp'; `
+    $text = Get-Content -Raw -LiteralPath $sourceFile; `
+    $old = @'
+#ifdef SERVER_ONLY
+            core::stringw name = L"Bot";
+#else
+            core::stringw name = _("Bot");
+#endif
+            name += core::stringw(" ") + StringUtils::toWString(i + 1);
+'@; `
+    $new = @'
+            static const wchar_t* const TKG_AI_NAMES[] =
+            {
+                L"Twisted Tux",
+                L"Whisker Wrecker",
+                L"Clawdia",
+                L"Turbo Tabby",
+                L"Purrgatory Pete",
+                L"Meowdrift",
+                L"Chaos Kitten",
+                L"Midnight Paws",
+                L"Feral Fiona",
+                L"Catastrophe"
+            };
+            constexpr unsigned TKG_AI_NAME_COUNT =
+                sizeof(TKG_AI_NAMES) / sizeof(TKG_AI_NAMES[0]);
+            core::stringw name;
+            if (i < TKG_AI_NAME_COUNT)
+                name = TKG_AI_NAMES[i];
+            else
+                name = L"TKG Racer " + StringUtils::toWString(i + 1);
+'@; `
+    if (-not $text.Contains($old)) { throw 'The expected STK Bot-name source block was not found; review the upstream STK source before rebuilding.' }; `
+    Set-Content -LiteralPath $sourceFile -Value $text.Replace($old, $new) -NoNewline
+
+RUN cmd /S /C "call C:\BuildTools\Common7\Tools\VsDevCmd.bat -arch=x64 && cd /d C:\build\stk-code && mkdir build && cd build && C:\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe .. -G \"Visual Studio 17 2022\" -A x64 -DCHECK_ASSETS=OFF && C:\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe --build . --config Release --target supertuxkart"
+
+FROM mcr.microsoft.com/windows/servercore:ltsc2022
+
+SHELL ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command"]
+
+ARG STK_ZIP_URL=https://github.com/supertuxkart/stk-code/releases/download/1.5/SuperTuxKart-1.5-win.zip
+ENV STK_ZIP_URL=${STK_ZIP_URL}
+
+WORKDIR C:/stk
+
+# Retain the official release data/DLL layout, but replace only the executable
+# with the custom source-built one from the builder stage.
+RUN New-Item -ItemType Directory -Force -Path C:/temp, C:/stk, C:/serverfiles | Out-Null; `
+    Invoke-WebRequest -UseBasicParsing -Uri $env:STK_ZIP_URL -OutFile C:/temp/stk.zip; `
+    Expand-Archive -Path C:/temp/stk.zip -DestinationPath C:/temp/stk -Force; `
+    $root = Get-ChildItem -Path C:/temp/stk -Directory | Where-Object { Test-Path (Join-Path $_.FullName 'stk-code/build-x86_64/bin/supertuxkart.exe') } | Select-Object -First 1; `
+    if (-not $root) { throw 'SuperTuxKart package root with x86_64 binary not found in release zip'; }; `
+    Copy-Item -Path (Join-Path $root.FullName '*') -Destination C:/stk -Recurse -Force; `
+    Remove-Item -Recurse -Force C:/temp
+
+COPY --from=builder C:/build/stk-code/build/bin/Release/supertuxkart.exe C:/stk/stk-code/build-x86_64/bin/supertuxkart.exe
+COPY Start.ps1 C:/stk/Start.ps1
+COPY server_config.xml C:/serverfiles/server_config.xml
+
+EXPOSE 2757/udp
+EXPOSE 2759/udp
+
+ENTRYPOINT ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "C:/stk/Start.ps1"]
