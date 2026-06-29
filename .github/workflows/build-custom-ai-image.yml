@@ -10,6 +10,7 @@ on:
       - server_config.xml
       - patches/**
       - scripts/Start-WindowsDocker.ps1
+      - blueprints/supertuxkart-gsa-windows-custom-ai-names.json
       - .github/workflows/build-custom-ai-image.yml
   workflow_dispatch:
 
@@ -32,24 +33,24 @@ jobs:
       - name: Sign in to GitHub Container Registry
         shell: powershell
         env:
-          GHCR_PAT: ${{ secrets.GHCR_PAT }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if ([string]::IsNullOrWhiteSpace($env:GHCR_PAT)) {
-            throw 'Add an Actions repository secret named GHCR_PAT containing a GitHub classic personal access token with write:packages and read:packages permissions. Include repo permission when this repository or package is private.'
+          if ([string]::IsNullOrWhiteSpace($env:GHCR_TOKEN)) {
+            throw 'GitHub did not provide the workflow token for GHCR authentication.'
           }
-          $env:GHCR_PAT | docker login ghcr.io --username "twistedbobross" --password-stdin
+          $env:GHCR_TOKEN | docker login ghcr.io --username "${{ github.actor }}" --password-stdin
 
       - name: Build the separate custom image
         shell: powershell
         run: |
           docker build --isolation=process `
             --file Dockerfile.custom-ai `
-            --tag ghcr.io/twistedbobross/supertuxkart-gsa-windows:custom-ai-names `
-            --tag ghcr.io/twistedbobross/supertuxkart-gsa-windows:custom-ai-names-${{ github.sha }} `
+            --tag ghcr.io/twistedbobross/supertuxkart-gsa-windows-custom-ai:1.5-tkg-ai-names `
+            --tag ghcr.io/twistedbobross/supertuxkart-gsa-windows-custom-ai:1.5-tkg-ai-names-${{ github.sha }} `
             .
 
-      - name: Publish the custom image tags
+      - name: Publish the separate custom image
         shell: powershell
         run: |
-          docker push ghcr.io/twistedbobross/supertuxkart-gsa-windows:custom-ai-names
-          docker push ghcr.io/twistedbobross/supertuxkart-gsa-windows:custom-ai-names-${{ github.sha }}
+          docker push ghcr.io/twistedbobross/supertuxkart-gsa-windows-custom-ai:1.5-tkg-ai-names
+          docker push ghcr.io/twistedbobross/supertuxkart-gsa-windows-custom-ai:1.5-tkg-ai-names-${{ github.sha }}
