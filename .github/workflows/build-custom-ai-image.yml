@@ -22,6 +22,9 @@ jobs:
   build-and-push:
     # Build this branch-only Windows image in GitHub Actions.
     runs-on: windows-2022
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: twistedbobross/supertuxkart-gsa-windows-custom-ai
     steps:
       - name: Check out custom image branch
         uses: actions/checkout@v4
@@ -30,27 +33,24 @@ jobs:
         shell: powershell
         run: ./scripts/Start-WindowsDocker.ps1
 
-      - name: Sign in to GitHub Container Registry
-        shell: powershell
-        env:
-          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if ([string]::IsNullOrWhiteSpace($env:GHCR_TOKEN)) {
-            throw 'GitHub did not provide the workflow token for GHCR authentication.'
-          }
-          $env:GHCR_TOKEN | docker login ghcr.io --username "${{ github.actor }}" --password-stdin
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build the separate custom image
         shell: powershell
         run: |
           docker build --isolation=process `
             --file Dockerfile.custom-ai `
-            --tag ghcr.io/twistedbobross/supertuxkart-gsa-windows-custom-ai:1.5-tkg-ai-names `
-            --tag ghcr.io/twistedbobross/supertuxkart-gsa-windows-custom-ai:1.5-tkg-ai-names-${{ github.sha }} `
+            --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:1.5-tkg-ai-names `
+            --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:1.5-tkg-ai-names-${{ github.sha }} `
             .
 
       - name: Publish the separate custom image
         shell: powershell
         run: |
-          docker push ghcr.io/twistedbobross/supertuxkart-gsa-windows-custom-ai:1.5-tkg-ai-names
-          docker push ghcr.io/twistedbobross/supertuxkart-gsa-windows-custom-ai:1.5-tkg-ai-names-${{ github.sha }}
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:1.5-tkg-ai-names
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:1.5-tkg-ai-names-${{ github.sha }}
