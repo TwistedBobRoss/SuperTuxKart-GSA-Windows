@@ -32,12 +32,12 @@ jobs:
       - name: Sign in to GitHub Container Registry
         shell: powershell
         env:
-          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GHCR_PAT: ${{ secrets.GHCR_PAT }}
         run: |
-          if ([string]::IsNullOrWhiteSpace($env:GHCR_TOKEN)) {
-            throw 'GitHub did not provide the workflow token for GHCR authentication.'
+          if ([string]::IsNullOrWhiteSpace($env:GHCR_PAT)) {
+            throw 'Add an Actions repository secret named GHCR_PAT containing a GitHub classic personal access token with write:packages and read:packages permissions. Include repo permission when this repository or package is private.'
           }
-          $env:GHCR_TOKEN | docker login ghcr.io --username "${{ github.actor }}" --password-stdin
+          $env:GHCR_PAT | docker login ghcr.io --username "twistedbobross" --password-stdin
 
       - name: Build the separate custom image
         shell: powershell
