@@ -49,11 +49,15 @@ $new = @'
 '@
 
 $text = [System.IO.File]::ReadAllText($SourceFile)
-if (-not $text.Contains($old)) {
+$normalizedText = $text -replace "`r`n", "`n"
+$normalizedOld = $old -replace "`r`n", "`n"
+$normalizedNew = $new -replace "`r`n", "`n"
+
+if (-not $normalizedText.Contains($normalizedOld)) {
     throw 'The expected STK Bot-name block was not found. Review the upstream 1.5 source before rebuilding.'
 }
 
-$updated = $text.Replace($old, $new)
+$updated = $normalizedText.Replace($normalizedOld, $normalizedNew)
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 [System.IO.File]::WriteAllText($SourceFile, $updated, $utf8NoBom)
 
